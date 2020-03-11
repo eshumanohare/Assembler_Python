@@ -1,0 +1,14 @@
+>> Errors to be covered:
+>> First pass error:
+>> start of the program not given        -- done
+>> Invalid label name and variable name -- name error     -- done
+>> label name and variable name cannot be same and multiple declaration error for variables only       -- done
+>> invalid number of operands for opcode (INP, BRP, BRZ, BRN)         -- done
+
+>> Second pass error:
+>> Enough space for complete program ( i dont know about it)
+>> opcode cannot have address as operand
+>> runtime error -- not declaration errors
+>> Invalid opcode name -- syntax error         -- can only be done in the second pass
+>> Multiple label definitions  -- label intialized too many times error
+>> end of program not found -- end not found error
