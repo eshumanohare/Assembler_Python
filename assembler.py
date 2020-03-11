@@ -1,7 +1,9 @@
-input_file = open("Input", "r")
+input_file = open("Input2", "r")
 object_code_file = open("ObjectCode", "w")
 
 input_file = input_file.read()
+
+check = 0           # counter for checking if START has appeared or not
 
 LC = 1
 
@@ -20,7 +22,7 @@ class my_dictionary (dict):
 	def add (self, key):
 		
 		global random_var_val
-		value = format( random_var_val, '08b')
+		value = format(random_var_val, '08b')
 		self[key] = value
 		random_var_val += 1
 	
@@ -30,8 +32,6 @@ class my_dictionary (dict):
 		value = format(LC, "08b")
 		self[key] = value
 		
-		
-
 variable_dict = my_dictionary()
 
 label_dict  = my_dictionary()
@@ -40,25 +40,73 @@ label_dict  = my_dictionary()
 
 def firstpass():
 	
+	global label_dict
+	global variable_dict
 	global LC
+	global check
 	
 	input_list = input_file.split("\n")
 
 	for items in input_list:
 		
+		# error for START not given in the start of the program
+		
+		if "START" not in items.split(" ") and check != 1:
+			check = 1
+			print("ERROR >> START address not given in the program")
+			continue
+		
+		
 		if items[0:3] == "INP":
 			#print(LC)
 			val = items.split(" ")
-			variable_dict.add(val[1])
-			#object_code_file.writelines(opcode_dict.get("INP") + str(variable_dict.get(val[1])))
 			
+			# error for checking if variable name is not same any label name and multiple declaration
+			if val[1] in label_dict or val[1] in variable_dict:
+				print("ERROR >> Variable name already used, multiple declaration is not allowed")
+				continue
+			
+			# error - invalid variable name handling according to basic identifier naming rule
+			s = val [1]
+			if not s [0].isalnum () and s[0] != "_":
+				print ("ERROR >> Variable name not well defined according to standard naming convention")
+				continue
+				
+			# error - invalid number of operands given in INP opcode
+			if len(val) > 2:
+				print("ERROR >> " + str(len(val) - 2) + " extra operands given for INP opcode")
+				continue
+			if len(val) == 1:
+				print("ERROR >> Too less operands given for INP opcode")
+				continue
+			
+				
+			
+			variable_dict.add(val[1])
+
+
 		if items[0:3] == "BRN" or items[0:3] == "BRZ" or items[0:3] == "BRP":
-			#print(LC)
+			
 			val = items.split(" ")
+			
+			# error - invalid label name handling according to basic identifier naming rule
+			s = val[1]
+			if not s[0].isalnum() and s[0] != "_":
+				print("ERROR >> Label name not well defined according to standard naming convention")
+				continue
+			
+			# error - invalid number of operands given in the BRP, BRN, BRZ opcode
+			if len(val) > 2:
+				print("ERROR >> " + str(len(val) - 2) + " extra operands given for " + str(val[0]) + " opcode")
+				continue
+			if len(val) == 1:
+				print("ERROR >> Too less operands given for " + str(val[0]) + " opcode")
+				continue
+				
 			if val[1] not in label_dict:          # to check whether the labels are already created or not
 				label_dict.add_label(val[1])
-				
-		
+			
+			
 		
 		LC += 1
 		
@@ -84,11 +132,27 @@ def secondPass():
 		if items[0:3] == "LAC":
 			val = items.split(" ")
 			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
+			
+		if items[0:3] == "SAC":
+			val = items.split(" ")
+			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
 		
+		if items[0:3] == "ADD":
+			val = items.split(" ")
+			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
+			
 		if items[0:3] == "SUB":
 			val = items.split(" ")
 			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
 			
+		if items[0:3] == "MUL":
+			val = items.split(" ")
+			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
+			
+		if items[0:3] == "DIV":
+			val = items.split(" ")
+			object_code_file.writelines(opcode_dict.get(val[0]) + variable_dict.get(val[1]) + "\n")
+		
 		if items[0:3] == "BRN":
 			val = items.split (" ")
 			object_code_file.writelines (opcode_dict.get (val [0]) + label_dict.get (val [1]) + "\n")
@@ -113,6 +177,8 @@ def secondPass():
 			else:
 				object_code_file.writelines(opcode_dict.get(val[1]) + variable_dict.get(val[2]) + "\n")
 				continue
+		
+		
 		
 	
 	
