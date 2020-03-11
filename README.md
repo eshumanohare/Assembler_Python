@@ -10,3 +10,6 @@ Assembler created in Python - CSE112 Project 01
 >> Second pass is mostly done
 >> The code is going to generate a new file in which the corresponding machine code is written
 >> error handling is yet to be done
+
+>> 12/3/20 -- 01:06 AM
+>> error handling for first pass is done
